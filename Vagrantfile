@@ -21,7 +21,7 @@ end
 
 Vagrant.configure(2) do |config|
   ## Instalação de plugin para configuração automática do disco
-  required_plugins = %w( vagrant-vbguest vagrant-disksize )
+  required_plugins = %w( vagrant-vbguest vagrant-disksize vagrant-env)
   _retry = false
   required_plugins.each do |plugin|
     unless Vagrant.has_plugin? plugin
@@ -35,30 +35,165 @@ Vagrant.configure(2) do |config|
   end
   
   # Box do vagrant contendo o ambiente de desenvolvimento do SEI
-  config.vm.box = "{{.BoxName}}"
+  # config.vm.box = "hashicorp/precise64"
+#   config.vm.box = "processoeletronico/sei-3.1"
+
+  config.vm.box = "centos/7"
+
+  config.env.enable # Enable vagrant-env(.env)
+
   config.disksize.size = "100GB"
+  config.vbguest.auto_update = true
+  config.vbguest.no_remote = false
+  config.vbguest.iso_mount_point = "/media"
+  config.vbguest.installer_options = { allow_kernel_upgrade: true }
 
   config.vm.provider "virtualbox" do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "4096", "--usb", "off", "--audio", "none"]
+    vb.customize ["modifyvm", :id, "--memory", ENV['SEI_MEMORY'], "--usb", "off", "--audio", "none"]
   end
-
+  
   # Configuração do diretório local onde deverá estar disponibilizado os códigos-fontes do SEI (sei, sip, infra_php, infra_css, infra_js)
-  config.vm.synced_folder ".", "/mnt/sei/src", mount_options: ["dmode=777", "fmode=777"]
+  config.vm.synced_folder ENV['SRC_HOME'], "/mnt/sei/src", mount_options: ["dmode=777", "fmode=777"]
+  config.vm.synced_folder ".", "/opt/vagrant/src", mount_options: ["dmode=777", "fmode=777"]
+
 
   # Configuração do redirecionamento entre Máquina Virtual e Host
-  config.vm.network :forwarded_port, guest: 8080, host: 8080   # SIP e SEI (Apache)
+  config.vm.network :forwarded_port, guest: 8000, host: 8000 # SIP e SEI (Apache)
   config.vm.network :forwarded_port, guest: 1521, host: 1521 # Banco de Dados (Oracle)
   config.vm.network :forwarded_port, guest: 1433, host: 1433 # Banco de Dados (SQL Server)
   config.vm.network :forwarded_port, guest: 3306, host: 3306 # Banco de Dados (Mysql)
   config.vm.network :forwarded_port, guest: 8983, host: 8983 # Solr Indexer (Jetty)
+  config.vm.network :forwarded_port, guest: 8080, host: 8080 # Jod Converter
   config.vm.network :forwarded_port, guest: 1080, host: 1080 # MailCatcher
 
+#   config.vm.provision "install-centos-server", type: "shell", run: "never", path: "./install.sh"
+
+  config.vm.provision "install-centos-docker", type: "shell", run: "never" do |s|
+    s.inline = <<-EOF
+        # SELinux Permissive
+        sudo setenforce 0
+
+        # set timezone JST
+        sudo timedatectl set-timezone America/Sao_Paulo
+
+        # EPEL
+        sudo yum install -y epel-release
+        sudo yum install -y vim git htop
+
+        # install docker
+        sudo yum remove docker \
+            docker-client \
+            docker-client-latest \
+            docker-common \
+            docker-latest \
+            docker-latest-logrotate \
+            docker-logrotate \
+            docker-selinux \
+            docker-engine-selinux \
+            docker-engine
+
+        sudo yum install -y yum-utils \
+            device-mapper-persistent-data \
+            lvm2
+
+        sudo yum-config-manager \
+            --add-repo \
+            https://download.docker.com/linux/centos/docker-ce.repo
+
+        sudo yum install -y docker-ce
+
+        # install docker-compose
+        sudo mkdir -p /opt/bin/
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod a+x /usr/local/bin/docker-compose
+
+        # vagrant user add docker group
+        sudo gpasswd -a vagrant docker
+
+        # docker running
+        sudo systemctl enable docker
+        sudo systemctl start docker
+    EOF
+  end
+
   config.vm.provision "docker-start", type: "shell", run: "always" do |s|
-    s.inline = "/bin/systemctl start docker.service"
+    s.inline = <<-EOF
+      sudo /bin/systemctl start docker.service
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml down
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml up -d
+    EOF
   end
 
-  config.vm.provision "docker-compose-start", type: "shell", run: "always" do |s|
-    s.inline = "/usr/local/bin/docker-compose -f /docker-compose.yml up -d"
+  config.vm.provision "mysql", type: "shell", run: "never" do |s|
+    s.inline = <<-EOF      
+      sudo /bin/systemctl start docker.service
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  down
+#      sudo ln -s --force  /opt/vagrant/src/env-mysql  /opt/vagrant/src/.env
+      sudo cp /opt/vagrant/src/env-mysql  /opt/vagrant/src/.env
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  up -d
+    EOF
   end
+
+  config.vm.provision "sqlserver", type: "shell", run: "never" do |s|
+    s.inline = <<-EOF
+      sudo /bin/systemctl start docker.service
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  down
+#       sudo ln -s --force  /opt/vagrant/src/env-sqlserver  /opt/vagrant/src/.env
+      sudo cp /opt/vagrant/src/env-sqlserver  /opt/vagrant/src/.env
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  up -d
+    EOF
+  end
+
+  config.vm.provision "oracle", type: "shell", run: "never" do |s|
+    s.inline = <<-EOF
+      sudo /bin/systemctl start docker.service
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  down
+#       sudo ln -s --force  /opt/vagrant/src/env-oracle  /opt/vagrant/src/.env
+      sudo cp /opt/vagrant/src/env-oracle  /opt/vagrant/src/.env
+      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  up -d
+    EOF
+  end
+
+  config.vm.post_up_message = <<-EOF
+
+=========================================================================
+  INICIALIZAÇÃO DO AMBIENTE DE DESENVOLVIMENTO FINALIZADA COM SUCESSO ! 
+=========================================================================
+
+= Endereços de Acesso à Aplicação ========================================
+SEI ............................... http://localhost:8000/sei
+SIP ............................... http://localhost:8000/sip
+
+Outros endereços úteis:
+Acesso de Usuário Externo ..... http://localhost:8000/sei/controlador_externo.php?acao=usuario_externo_logar&id_orgao_acesso_externo=0
+Autenticidade de Documentos ... http://localhost:8000/sei/controlador_externo.php?acao=documento_conferir&id_orgao_acesso_externo=0
+Publicações Eletrônicas ....... http://localhost:8000/sei/publicacoes/controlador_publicacoes.php?acao=publicacao_pesquisar&id_orgao_publicacao=0
+WSDL de integração do SEI ..... http://localhost:8000/sei/ws/SeiWS.php
+
+
+= Outros Serviços ========================================================
+Solr .............................. http://localhost:8983/solr
+MailCatcher ....................... http://localhost:1080
+Mysql ............................. localhost:3306
+Oracle ............................ localhost:1521
+SQLServer ......................... localhost:1433
+
+= Comandos Úteis =========================================================
+vagrant up                        - Inicializar ambiente do SEI
+vagrant halt                      - Desligar ambiente
+vagrant destroy                   - Destruir ambiente e base de testes
+vagrant ssh                       - Acessar máquina virtual
+vagrant status                    - Verificar situação atual do ambiente
+
+Utilize o parâmetro '--provision-with' para alterar o banco de dados padrão:
+
+vagrant up --provision-with [mysql|oracle|sqlserver]
+-- ou --
+vagrant provision --provision-with [mysql|oracle|sqlserver]
+
+= Debug =========================================================
+PHP xDebug 3
+Porta: 9003
+
+EOF
 end
-
