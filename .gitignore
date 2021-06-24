@@ -1,4 +1,5 @@
 .vagrant/
+.vscode/
 mysql/.tmp
 Vagrantfile.conf
 packer/
