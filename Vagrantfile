@@ -37,8 +37,9 @@ Vagrant.configure(2) do |config|
   # Box do vagrant contendo o ambiente de desenvolvimento do SEI
   # config.vm.box = "hashicorp/precise64"
 #   config.vm.box = "processoeletronico/sei-3.1"
-
-  config.vm.box = "centos/7"
+#     config.vm.box = "centos/7"
+#     config.vm.box = "bento/centos-7"
+    config.vm.box = "bento/ubuntu-20.04"
 
   config.env.enable # Enable vagrant-env(.env)
 
@@ -56,7 +57,6 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder ENV['SRC_HOME'], "/mnt/sei/src", mount_options: ["dmode=777", "fmode=777"]
   config.vm.synced_folder ".", "/opt/vagrant/src", mount_options: ["dmode=777", "fmode=777"]
 
-
   # Configuração do redirecionamento entre Máquina Virtual e Host
   config.vm.network :forwarded_port, guest: 8000, host: 8000 # SIP e SEI (Apache)
   config.vm.network :forwarded_port, guest: 1521, host: 1521 # Banco de Dados (Oracle)
@@ -66,55 +66,11 @@ Vagrant.configure(2) do |config|
   config.vm.network :forwarded_port, guest: 8080, host: 8080 # Jod Converter
   config.vm.network :forwarded_port, guest: 1080, host: 1080 # MailCatcher
 
+  config.vm.provision "install-docker", type: "shell", path: "./install-docker.sh"
+  config.vm.provision "install-docker-compose", type: "shell", path: "./install-docker-compose.sh"
+  config.vm.provision "install-docker-machines", type: "shell", path: "./run.sh"
+
 #   config.vm.provision "install-centos-server", type: "shell", run: "never", path: "./install.sh"
-
-  config.vm.provision "install-centos-docker", type: "shell", run: "never" do |s|
-    s.inline = <<-EOF
-        # SELinux Permissive
-        sudo setenforce 0
-
-        # set timezone JST
-        sudo timedatectl set-timezone America/Sao_Paulo
-
-        # EPEL
-        sudo yum install -y epel-release
-        sudo yum install -y vim git htop
-
-        # install docker
-        sudo yum remove docker \
-            docker-client \
-            docker-client-latest \
-            docker-common \
-            docker-latest \
-            docker-latest-logrotate \
-            docker-logrotate \
-            docker-selinux \
-            docker-engine-selinux \
-            docker-engine
-
-        sudo yum install -y yum-utils \
-            device-mapper-persistent-data \
-            lvm2
-
-        sudo yum-config-manager \
-            --add-repo \
-            https://download.docker.com/linux/centos/docker-ce.repo
-
-        sudo yum install -y docker-ce
-
-        # install docker-compose
-        sudo mkdir -p /opt/bin/
-        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod a+x /usr/local/bin/docker-compose
-
-        # vagrant user add docker group
-        sudo gpasswd -a vagrant docker
-
-        # docker running
-        sudo systemctl enable docker
-        sudo systemctl start docker
-    EOF
-  end
 
   config.vm.provision "docker-start", type: "shell", run: "always" do |s|
     s.inline = <<-EOF
