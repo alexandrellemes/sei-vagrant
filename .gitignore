@@ -4,7 +4,6 @@ Vagrantfile.conf
 packer/
 dist/
 .idea/
-.vagrant/
 logs/
 mydb/
 mysql-data/
