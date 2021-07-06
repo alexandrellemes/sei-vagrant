@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mkdir -p /opt/sip/config/
 mkdir -p /opt/sei/config/
@@ -22,7 +22,6 @@ if [ ! -f /opt/sip/config/ConfiguracaoSip.php ]; then
 fi
 
 # Ajustes de permissões diversos para desenvolvimento do SEI
-chmod +x /opt/sei/bin/wkhtmltopdf-amd64
 chmod +x /opt/sei/bin/pdfboxmerge.jar
 chmod -R 777 /opt/sei/temp
 chmod -R 777 /opt/sip/temp
@@ -38,10 +37,10 @@ crond
 HOST_URL=${HOST_URL:-"http://localhost:8000"}
 SEI_DATABASE_NAME=${SEI_DATABASE_NAME:-"sei"}
 SEI_DATABASE_USER=${SEI_DATABASE_USER:-"root"}
-SEI_DATABASE_PASSWORD=${SEI_DATABASE_PASSWORD:-"root"}
+SEI_DATABASE_PASSWORD=${SEI_DATABASE_PASSWORD:-"P@ssword"}
 SIP_DATABASE_NAME=${SIP_DATABASE_NAME:-"sip"}
 SIP_DATABASE_USER=${SIP_DATABASE_USER:-"root"}
-SIP_DATABASE_PASSWORD=${SIP_DATABASE_PASSWORD:-"root"}
+SIP_DATABASE_PASSWORD=${SIP_DATABASE_PASSWORD:-"P@ssword"}
 
 # Atualizar os endereços de host definidos para na inicialização e sincronização de sequências
 php -r "
@@ -66,9 +65,6 @@ php -r "
 " || exit 1
 
 memcached -u memcached -d -m 30 -l 127.0.0.1 -p 11211
-
-export ORACLE_HOME=/usr/lib/oracle/12.2/client64
-export LD_LIBRARY_PATH=$ORACLE_HOME/lib
 
 # Inicialização do servidor web
 /usr/sbin/httpd -DFOREGROUND

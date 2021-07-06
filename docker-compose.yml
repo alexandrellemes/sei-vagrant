@@ -1,23 +1,23 @@
-version: '3'
+version: '2'
 services:
   jod:  
-#    image: processoeletronico/vagrant_sei4_jod:${ENVIRONMENT_VERSION}
-    build:
-      context: ./jod
+    image: processoeletronico/vagrant_sei4_jod:${ENVIRONMENT_VERSION}
+#    build:
+#      context: ./jod
     container_name: jod
 
   smtp:
-#    image: processoeletronico/vagrant_sei4_mailcatcher:${ENVIRONMENT_VERSION}
-    build:
-      context: ./mailcatcher
+    image: processoeletronico/vagrant_sei4_mailcatcher:${ENVIRONMENT_VERSION}
+#    build:
+#      context: ./mailcatcher
     container_name: smtp
     ports:
       - "1080:1080"
 
   memcached:
-#    image: processoeletronico/vagrant_sei4_memcached:${ENVIRONMENT_VERSION}
-    build:
-      context: ./memcached
+    image: processoeletronico/vagrant_sei4_memcached:${ENVIRONMENT_VERSION}
+#    build:
+#      context: ./memcached
     container_name: memcached
     ports:
       - "11211:11211"
@@ -29,25 +29,25 @@ services:
     container_name: ${DATABASE_HOST}
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: P@ssword
     volumes:
       - ${DATABASE_HOST}:${DATABASE_DATA_DIR}
-      - /var/sei/${DATABASE_HOST}/backup:/backup
+      - /var/sei/backup/${DATABASE_HOST}:/backup
     ports:
       - ${DATABASE_PORT}:${DATABASE_PORT}
 
   solr:
-#    image: processoeletronico/vagrant_sei4_solr:${ENVIRONMENT_VERSION}
-    build:
-      context: ./solr
+    image: processoeletronico/vagrant_sei4_solr:${ENVIRONMENT_VERSION}
+#    build:
+#      context: ./solr
     container_name: solr
     ports:
       - "8983:8983"
 
   httpd:
-#    image: processoeletronico/vagrant_sei4_httpd:${ENVIRONMENT_VERSION}
-    build:
-      context: ./httpd
+    image: processoeletronico/vagrant_sei4_httpd:${ENVIRONMENT_VERSION}
+#    build:
+#      context: ./httpd
     container_name: httpd
     restart: always
     ports:
@@ -55,8 +55,11 @@ services:
     depends_on: 
       - database
     volumes:
-      - /mnt/sei/src:/opt
+      - /mnt/sei/src/sei:/opt/sei
+      - /mnt/sei/src/sip:/opt/sip
+      - /mnt/sei/src/infra:/opt/infra
     environment:
+      - LANG=pt_BR.ISO-8859-1
       - XDEBUG_CONFIG="idekey=default client_host=${HOST_IP} client_port=9003 discover_client_host=1"
       - XDEBUG_SESSION=default
       - XDEBUG_MODE=debug

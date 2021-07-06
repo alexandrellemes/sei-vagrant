@@ -35,12 +35,8 @@ Vagrant.configure(2) do |config|
   end
   
   # Box do vagrant contendo o ambiente de desenvolvimento do SEI
-  # config.vm.box = "hashicorp/precise64"
-#   config.vm.box = "processoeletronico/sei-3.1"
-#     config.vm.box = "centos/7"
-#     config.vm.box = "bento/centos-7"
-    config.vm.box = "bento/ubuntu-20.04"
-
+#   config.vm.box = "{{.BoxName}}"
+  config.vm.box = "bento/ubuntu-20.04"
   config.env.enable # Enable vagrant-env(.env)
 
   config.disksize.size = "100GB"
@@ -70,43 +66,39 @@ Vagrant.configure(2) do |config|
   config.vm.provision "install-docker-compose", type: "shell", path: "./install-docker-compose.sh"
   config.vm.provision "install-docker-machines", type: "shell", path: "./run.sh"
 
-#   config.vm.provision "install-centos-server", type: "shell", run: "never", path: "./install.sh"
-
-  config.vm.provision "docker-start", type: "shell", run: "always" do |s|
-    s.inline = <<-EOF
-      sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml down
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml up -d
-    EOF
-  end
+#   config.vm.provision "docker-start", type: "shell", run: "always" do |s|
+#     s.inline = <<-EOF
+#       /bin/systemctl start docker.service
+#       /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env down
+#       [ ! -f "/mnt/sei/src/.env" ] && cp -f /env-mysql /mnt/sei/src/.env
+#       /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env up -d
+#     EOF
+#   end
 
   config.vm.provision "mysql", type: "shell", run: "never" do |s|
     s.inline = <<-EOF      
-      sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  down
-#      sudo ln -s --force  /home/docker/discoDocker/docker/env-mysql  /home/docker/discoDocker/docker/.env
-      sudo cp /home/docker/discoDocker/docker/env-mysql  /home/docker/discoDocker/docker/.env
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  up -d
+      /bin/systemctl start docker.service
+      /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env down
+      cp -f /env-mysql /mnt/sei/src/.env
+      /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env up -d
     EOF
   end
 
   config.vm.provision "sqlserver", type: "shell", run: "never" do |s|
     s.inline = <<-EOF
-      sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  down
-#       sudo ln -s --force  /home/docker/discoDocker/docker/env-sqlserver  /home/docker/discoDocker/docker/.env
-      sudo cp /home/docker/discoDocker/docker/env-sqlserver  /home/docker/discoDocker/docker/.env
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  up -d
+      /bin/systemctl start docker.service
+      /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env down
+      cp -f /env-sqlserver /mnt/sei/src/.env
+      /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env up -d
     EOF
   end
 
   config.vm.provision "oracle", type: "shell", run: "never" do |s|
     s.inline = <<-EOF
-      sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  down
-#       sudo ln -s --force  /home/docker/discoDocker/docker/env-oracle  /home/docker/discoDocker/docker/.env
-      sudo cp /home/docker/discoDocker/docker/env-oracle  /home/docker/discoDocker/docker/.env
-      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  up -d
+      /bin/systemctl start docker.service
+      /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env down
+      cp -f /env-oracle /mnt/sei/src/.env
+      /usr/local/bin/docker-compose -f /docker-compose.yml --env-file /mnt/sei/src/.env up -d
     EOF
   end
 
@@ -117,22 +109,21 @@ Vagrant.configure(2) do |config|
 =========================================================================
 
 = Endereços de Acesso à Aplicação ========================================
-SEI ............................... http://localhost:8000/sei
-SIP ............................... http://localhost:8000/sip
+SEI ........................... http://localhost:8000/sei
+SIP ........................... http://localhost:8000/sip
 
-Outros endereços úteis:
-Acesso de Usuário Externo ..... http://localhost:8000/sei/controlador_externo.php?acao=usuario_externo_logar&id_orgao_acesso_externo=0
-Autenticidade de Documentos ... http://localhost:8000/sei/controlador_externo.php?acao=documento_conferir&id_orgao_acesso_externo=0
-Publicações Eletrônicas ....... http://localhost:8000/sei/publicacoes/controlador_publicacoes.php?acao=publicacao_pesquisar&id_orgao_publicacao=0
-WSDL de integração do SEI ..... http://localhost:8000/sei/ws/SeiWS.php
-
+Acesso de Usuário Externo ..... [SEI]/controlador_externo.php?acao=usuario_externo_logar&id_orgao_acesso_externo=0
+Autenticidade de Documentos ... [SEI]/controlador_externo.php?acao=documento_conferir&id_orgao_acesso_externo=0
+Publicações Eletrônicas ....... [SEI]/publicacoes/controlador_publicacoes.php?acao=publicacao_pesquisar&id_orgao_publicacao=0
+WSDL de integração do SEI ..... [SEI]/ws/SeiWS.php
+PHP Info ...................... http://localhost:8000/info.php
 
 = Outros Serviços ========================================================
-Solr .............................. http://localhost:8983/solr
-MailCatcher ....................... http://localhost:1080
-Mysql ............................. localhost:3306
-Oracle ............................ localhost:1521
-SQLServer ......................... localhost:1433
+Solr .......................... http://localhost:8983/solr
+MailCatcher ................... http://localhost:1080
+Mysql ......................... localhost:3306
+Oracle ........................ localhost:1521
+SQLServer ..................... localhost:1433
 
 = Comandos Úteis =========================================================
 vagrant up                        - Inicializar ambiente do SEI
@@ -148,7 +139,7 @@ vagrant up --provision-with [mysql|oracle|sqlserver]
 vagrant provision --provision-with [mysql|oracle|sqlserver]
 
 = Debug =========================================================
-PHP xDebug 3
+PHP xDebug3
 Porta: 9003
 
 EOF

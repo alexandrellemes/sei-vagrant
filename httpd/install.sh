@@ -1,28 +1,32 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Instalação dos componentes básicos do servidor web apache
-yum -y install epel-release yum-utils
+yum install -y epel-release yum-utils
 
 # Configurando para instalar a versão 7.3 do PHP e desabilitando a 5.4
-yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum-config-manager --disable remi-php54
 yum-config-manager --enable remi-php73
-yum -y  update
+yum update -y 
 
-yum -y install build-essential libmcrypt httpd memcached openssl wget curl unzip gcc java-1.8.0-openjdk \
-                libxml2 crontabs mysql policycoreutils policycoreutils-python setools setools-console \
-                setroubleshoot whatprovides netstat net-tools \
-                vim git nc libgearman-dev libgearman-devel
+yum install -y http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+yum install -y https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox-0.12.6-1.centos7.x86_64.rpm
+
+# Instalação de ferramentas utilitárias e dependências do SEI 4.0
+yum install -y build-essential libmcrypt httpd memcached openssl wget curl unzip gcc java-1.8.0-openjdk \
+               libxml2 crontabs mysql netstat net-tools vim git nc libgearman-dev libgearman-devel ffmpeg
 
 
 # Instalação do PHP e demais extenções necessárias para o projeto
-yum -y install php php-pear php-devel php-calendar php-mcrypt php-shmop php-zlib php-zts php-soap php-gd php-bcmath \
-               php73.x86_64 php-bcmath.x86_64 php-cli.x86_64 php-common.x86_64 php-devel.x86_64 php-gd.x86_64 \
-               php73pat-php-gmp.x86_64 php-imap.x86_64 php-intl.x86_64 php-ldap.x86_64 php-mbstring.x86_64 php-mysqlnd.x86_64 \
-               php-mysqli php-mysqli php-odbc.x86_64 php-pdo.x86_64 php-pear.noarch php-pecl-apcu.x86_64 php-pecl-apcu-devel.x86_64 \
-               php-pecl-memcache php-pecl-memcache.x86_64 php-pecl-xdebug.x86_64 php-pspell.x86_64 php-snmp.x86_64 \
-               php-pecl-igbinary.x86_64 php-pecl-igbinary-devel.x86_64  php-soap.x86_64 php-xml.x86_64 php-xmlrpc.x86_64 php-xdebug               
+yum install -y php php-pear php-devel php-calendar php-mcrypt php-shmop php-zlib php-zts php-soap php-gd php-bcmath \
+               php-cli php-common php73pat-php-gmp php-imap php-intl php-ldap php-mbstring \
+               php-mysqlnd php-mysqli php-odbc php-pdo php-pecl-apcu php-pecl-apcu-devel php-curl \
+               php-pecl-memcache php-pspell php-snmp php-pecl-igbinary php-pecl-igbinary-devel \
+               php-xml php-xmlrpc php-zip php-json php-sodium
 
+
+# Instalação do XDebug, versão 3
+pecl install xdebug-3.0.4   
 
 # Configuração do pacote de línguas pt_BR
 localedef pt_BR -i pt_BR -f ISO-8859-1
@@ -36,15 +40,19 @@ make
 make install
 echo "extension=uploadprogress.so" > /etc/php.d/uploadprogress.ini
 
-
 # Instalação de pacote de fontes do windows
 rpm -Uvh /tmp/msttcore-fonts-2.0-3.noarch.rpm
 
 # Instalação dos componentes de conexão do Oracle (Oracle Instant Client)
-/tmp/install_oracle.sh
+bash /tmp/install_oracle.sh
 
 # Instalação dos componentes de conexão do SQL Server
-yum -y install freetds freetds-devel php-mssql
+curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo
+ACCEPT_EULA=Y yum install -y msodbcsql17
+yum install -y libodbc1 unixODBC unixODBC-devel php-mssql php-pdo
+pecl install sqlsrv pdo_sqlsrv
+printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php.d/20-sqlsrv.ini
+printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php.d/30-pdo_sqlsrv.ini
 
 # Configuração de permissão do diretório de arquivos
 mkdir -p /var/sei/arquivos

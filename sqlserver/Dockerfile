@@ -18,7 +18,7 @@ COPY sei-db-ref-executivo/sqlserver/v4.0.0/sip_4_0_0_BD_Ref_Exec.bak /tmp/sip_sq
 COPY assets/restore.sql /tmp/restore.sql
 COPY install.sh /install.sh
 
-RUN /install.sh
+RUN bash /install.sh
 ############################## FIM DA INSTALACAO ###############################
 
 # Imagem de base já configura a exposição das portas 1521 e inicialização do

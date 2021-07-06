@@ -1,10 +1,10 @@
 .vagrant/
-.vscode/
 mysql/.tmp
 Vagrantfile.conf
 packer/
 dist/
 .idea/
+.vagrant/
 logs/
 mydb/
 mysql-data/
@@ -13,3 +13,7 @@ mysql-files/
 *.swp
 *.box
 *.log
+
+mysql/sei-db-ref-executivo
+oracle/sei-db-ref-executivo
+sqlserver/sei-db-ref-executivo

@@ -1,10 +1,9 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -e
 
 # Variáveis de ambiente
 export ACCEPT_EULA=Y
-export SA_PASSWORD='yourStrong(!)Password'
+export SA_PASSWORD='P@ssword'
 
 # Instalação do FreeTDS para acesso ao SQL Server
 apt-get -y --allow-unauthenticated update

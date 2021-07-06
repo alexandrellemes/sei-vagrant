@@ -20,7 +20,7 @@ COPY assets/sip-config.sql /tmp/sip-config.sql
 COPY install.sh /install.sh
 
 
-RUN /install.sh
+RUN bash /install.sh
 ############################## FIM DA INSTALACAO ###############################
 
 # Imagem de base já configura a exposição das portas 1521 e inicialização do

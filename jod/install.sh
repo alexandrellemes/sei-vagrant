@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # Configuração do pacote de línguas pt_BR
 localedef pt_BR -i pt_BR -f ISO-8859-1
