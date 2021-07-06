@@ -85,7 +85,7 @@ echo '/etc/profile.d/client.sh'
 cat /etc/profile.d/client.sh
 
 echo 'executa /etc/profile.d/client.sh'
-sh /etc/profile.d/client.sh
+/etc/profile.d/client.sh
 
 #ldconfig
 

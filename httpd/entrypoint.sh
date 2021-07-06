@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 mkdir -p /opt/sip/config/
 mkdir -p /opt/sei/config/

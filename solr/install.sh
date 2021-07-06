@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 set -e
 
@@ -17,7 +17,7 @@ SOLR_URL=https://archive.apache.org/dist/lucene/solr/6.1.0/solr-6.1.0.tgz
 wget -nv $SOLR_URL -O /tmp/solr-6.1.0.tgz
 
 # Instalação do Apache Solr 6.1
-sh /tmp/sei-solr-6.1.0.sh
+/tmp/sei-solr-6.1.0.sh
 
 # Construção dos índices de protocolos do SEI
 /opt/solr/bin/solr start && sleep 15

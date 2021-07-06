@@ -28,7 +28,7 @@ COPY assets/oracle/install_oracle.sh /tmp/
 COPY install.sh /install.sh
 COPY entrypoint.sh /entrypoint.sh
 
-RUN bash /install.sh
+RUN /install.sh
 
 # Configurações gerais dos componentes do servidor
 COPY assets/info.php /var/www/html/info.php
@@ -39,8 +39,8 @@ COPY assets/xdebug.ini /etc/php.d/xdebug.ini
 COPY assets/freetds.conf /etc/freetds.conf
 
 # Configuração dos parâmetros do SEI e SIP
-COPY assets/ConfiguracaoSip.php /ConfiguracaoSip.php
-COPY assets/ConfiguracaoSEI.php /ConfiguracaoSEI.php
+#COPY assets/ConfiguracaoSip.php /ConfiguracaoSip.php
+#COPY assets/ConfiguracaoSEI.php /ConfiguracaoSEI.php
 
 ##################### FIM DA INSTALAÇÃO #####################
 

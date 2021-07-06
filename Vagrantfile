@@ -55,7 +55,7 @@ Vagrant.configure(2) do |config|
   
   # Configuração do diretório local onde deverá estar disponibilizado os códigos-fontes do SEI (sei, sip, infra_php, infra_css, infra_js)
   config.vm.synced_folder ENV['SRC_HOME'], "/mnt/sei/src", mount_options: ["dmode=777", "fmode=777"]
-  config.vm.synced_folder ".", "/opt/vagrant/src", mount_options: ["dmode=777", "fmode=777"]
+  config.vm.synced_folder ".", "/home/docker/discoDocker/docker", mount_options: ["dmode=777", "fmode=777"]
 
   # Configuração do redirecionamento entre Máquina Virtual e Host
   config.vm.network :forwarded_port, guest: 8000, host: 8000 # SIP e SEI (Apache)
@@ -75,38 +75,38 @@ Vagrant.configure(2) do |config|
   config.vm.provision "docker-start", type: "shell", run: "always" do |s|
     s.inline = <<-EOF
       sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml down
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml up -d
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml down
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml up -d
     EOF
   end
 
   config.vm.provision "mysql", type: "shell", run: "never" do |s|
     s.inline = <<-EOF      
       sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  down
-#      sudo ln -s --force  /opt/vagrant/src/env-mysql  /opt/vagrant/src/.env
-      sudo cp /opt/vagrant/src/env-mysql  /opt/vagrant/src/.env
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  up -d
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  down
+#      sudo ln -s --force  /home/docker/discoDocker/docker/env-mysql  /home/docker/discoDocker/docker/.env
+      sudo cp /home/docker/discoDocker/docker/env-mysql  /home/docker/discoDocker/docker/.env
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  up -d
     EOF
   end
 
   config.vm.provision "sqlserver", type: "shell", run: "never" do |s|
     s.inline = <<-EOF
       sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  down
-#       sudo ln -s --force  /opt/vagrant/src/env-sqlserver  /opt/vagrant/src/.env
-      sudo cp /opt/vagrant/src/env-sqlserver  /opt/vagrant/src/.env
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  up -d
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  down
+#       sudo ln -s --force  /home/docker/discoDocker/docker/env-sqlserver  /home/docker/discoDocker/docker/.env
+      sudo cp /home/docker/discoDocker/docker/env-sqlserver  /home/docker/discoDocker/docker/.env
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  up -d
     EOF
   end
 
   config.vm.provision "oracle", type: "shell", run: "never" do |s|
     s.inline = <<-EOF
       sudo /bin/systemctl start docker.service
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  down
-#       sudo ln -s --force  /opt/vagrant/src/env-oracle  /opt/vagrant/src/.env
-      sudo cp /opt/vagrant/src/env-oracle  /opt/vagrant/src/.env
-      sudo /usr/local/bin/docker-compose --env-file /opt/vagrant/src/.env -f /opt/vagrant/src/docker-compose.yml  up -d
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  down
+#       sudo ln -s --force  /home/docker/discoDocker/docker/env-oracle  /home/docker/discoDocker/docker/.env
+      sudo cp /home/docker/discoDocker/docker/env-oracle  /home/docker/discoDocker/docker/.env
+      sudo /usr/local/bin/docker-compose --env-file /home/docker/discoDocker/docker/.env -f /home/docker/discoDocker/docker/docker-compose.yml  up -d
     EOF
   end
 
