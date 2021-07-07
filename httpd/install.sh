@@ -3,10 +3,10 @@
 # Instalação dos componentes básicos do servidor web apache
 yum install -y epel-release yum-utils
 
-# Configurando para instalar a versão 7.3 do PHP e desabilitando a 5.4
+# Configurando para instalar a versão 7.4 do PHP e desabilitando a 5.4
 yum install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum-config-manager --disable remi-php54
-yum-config-manager --enable remi-php73
+yum-config-manager --enable remi-php74
 yum update -y 
 
 yum install -y http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm

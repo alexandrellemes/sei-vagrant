@@ -45,9 +45,9 @@ services:
       - "8983:8983"
 
   httpd:
-    image: processoeletronico/vagrant_sei4_httpd:${ENVIRONMENT_VERSION}
-#    build:
-#      context: ./httpd
+#    image: processoeletronico/vagrant_sei4_httpd:${ENVIRONMENT_VERSION}
+    build:
+      context: ./httpd
     container_name: httpd
     restart: always
     ports:
