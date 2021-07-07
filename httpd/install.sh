@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Instalação dos componentes básicos do servidor web apache
 yum install -y epel-release yum-utils
@@ -44,7 +44,7 @@ echo "extension=uploadprogress.so" > /etc/php.d/uploadprogress.ini
 rpm -Uvh /tmp/msttcore-fonts-2.0-3.noarch.rpm
 
 # Instalação dos componentes de conexão do Oracle (Oracle Instant Client)
-bash /tmp/install_oracle.sh
+/tmp/install_oracle.sh
 
 # Instalação dos componentes de conexão do SQL Server
 curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/mssql-release.repo

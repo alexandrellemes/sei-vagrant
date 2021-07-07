@@ -21,7 +21,7 @@ COPY assets/oracle/install_oracle.sh /tmp/
 COPY install.sh /install.sh
 COPY entrypoint.sh /entrypoint.sh
 
-RUN bash /install.sh
+RUN /install.sh
 
 # Configurações gerais dos componentes do servidor
 COPY assets/info.php /var/www/html/info.php

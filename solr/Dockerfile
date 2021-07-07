@@ -10,7 +10,7 @@ ENV TERM xterm
 
 COPY assets /tmp/assets
 
-RUN sh /tmp/assets/install.sh
+RUN /tmp/assets/install.sh
 
 EXPOSE 8983
 CMD ["/entrypoint.sh"]

@@ -14,7 +14,7 @@ COPY install.sh /install.sh
 COPY entrypoint.sh /entrypoint.sh
 COPY assets/jodconverter-tomcat-2.2.2.zip /tmp/
 
-RUN sh /install.sh
+RUN /install.sh
 ############################## FIM DA INSTALACAO ###############################
 
 EXPOSE 8080

@@ -1,23 +1,23 @@
 version: '2'
 services:
   jod:  
-    image: processoeletronico/vagrant_sei4_jod:${ENVIRONMENT_VERSION}
-#    build:
-#      context: ./jod
+#    image: processoeletronico/vagrant_sei4_jod:${ENVIRONMENT_VERSION}
+    build:
+      context: ./jod
     container_name: jod
 
   smtp:
-    image: processoeletronico/vagrant_sei4_mailcatcher:${ENVIRONMENT_VERSION}
-#    build:
-#      context: ./mailcatcher
+#    image: processoeletronico/vagrant_sei4_mailcatcher:${ENVIRONMENT_VERSION}
+    build:
+      context: ./mailcatcher
     container_name: smtp
     ports:
       - "1080:1080"
 
   memcached:
-    image: processoeletronico/vagrant_sei4_memcached:${ENVIRONMENT_VERSION}
-#    build:
-#      context: ./memcached
+#    image: processoeletronico/vagrant_sei4_memcached:${ENVIRONMENT_VERSION}
+    build:
+      context: ./memcached
     container_name: memcached
     ports:
       - "11211:11211"
@@ -37,9 +37,9 @@ services:
       - ${DATABASE_PORT}:${DATABASE_PORT}
 
   solr:
-    image: processoeletronico/vagrant_sei4_solr:${ENVIRONMENT_VERSION}
-#    build:
-#      context: ./solr
+#    image: processoeletronico/vagrant_sei4_solr:${ENVIRONMENT_VERSION}
+    build:
+      context: ./solr
     container_name: solr
     ports:
       - "8983:8983"

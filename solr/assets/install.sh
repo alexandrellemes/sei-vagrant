@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 set -e
 
@@ -23,7 +23,7 @@ useradd solr
 chmod +x /tmp/sei-solr-8.2.0.sh
 
 # Instalação do Apache Sol2
-sh /tmp/sei-solr-8.2.0.sh
+/tmp/sei-solr-8.2.0.sh
 
 mv /tmp/assets/entrypoint.sh /
 

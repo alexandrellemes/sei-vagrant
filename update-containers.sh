@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 set -e
 
 VERSAO_CONTAINERS='8.0'

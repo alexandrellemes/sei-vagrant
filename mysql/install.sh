@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 mysql_secure_installation <<EOF
 P@ssword
