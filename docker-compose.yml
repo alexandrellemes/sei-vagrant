@@ -23,9 +23,9 @@ services:
       - "11211:11211"
 
   database:
-    image: ${DATABASE_IMAGE}:${ENVIRONMENT_VERSION}
-#    build:
-#      context: ./${DATABASE_HOST}
+#    image: ${DATABASE_IMAGE}:${ENVIRONMENT_VERSION}
+    build:
+      context: ./${DATABASE_HOST}
     container_name: ${DATABASE_HOST}
     restart: always
     environment:
